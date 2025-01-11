@@ -1,56 +1,143 @@
 const express = require('express');
+const connectDB = require('./config/database');
+const userRoutes = require('./routes/userWeb');
+const cors = require('cors'); // Добавить пакет cors
 const mongoose = require('mongoose');
 const TelegramBot = require('node-telegram-bot-api');
 const crypto = require('crypto');
 const { createCanvas } = require('canvas');
-const cors = require('cors');
-const User = require('./models/user'); // Подключение модели пользователя
-const connectDB = require('./config/database'); // Подключение базы данных
-const userRoutes = require('./routes/userWeb'); // Подключение маршрутов пользователя
-require('dotenv').config();
+const User = require('./models/user');
+require('dotenv').config()
+
+mongoose.connect(process.env.MONGODB_URI);
+
+const token = process.env.TOKEN
+const bot = new TelegramBot(token, { polling: true });
+const webAppUrl = process.env.WEBAPPURI
+const communityAppUrl = process.env.COMMUNITY_APP_URI
 
 const app = express();
-const token = process.env.TOKEN;
-const bot = new TelegramBot(token);
-const webhookUrl = `${process.env.WEBAPPURI}/bot${token}`;
 const port = process.env.PORT || 3001;
 
-// Подключение к базе данных
 connectDB();
 
-// Middleware
-app.use(cors());
+app.use(cors()); // Включить CORS для всех маршрутов
 app.use(express.json());
 
-// Telegram Bot Webhook
-bot.setWebHook(webhookUrl);
-
-app.post(`/bot${token}`, (req, res) => {
-    bot.processUpdate(req.body);
-    res.sendStatus(200);
+app.get('/backend', (req, res) => {
+    res.send('Hello from backend!');
 });
 
-// API маршрут
+// Маршруты пользователя
 app.use('/api/users', userRoutes);
 
-// Дополнительный тестовый маршрут
-app.get('/', (req, res) => {
-    res.send('Hello from combined backend and Telegram bot!');
-});
 
-// Telegram Bot логика
+const checkUserPremiumStatus = async (userId) => {
+    try {
+        const user = await bot.getChat(userId);
+        return user.is_premium || false;
+    } catch (error) {
+        console.error('Ошибка при проверке статуса премиум:', error);
+        return false;
+    }
+};
+
 bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
-    const username = msg.from.username || 'User';
+    const username = msg.from.username || msg.from.first_name || msg.from.last_name || 'User';
+    const languageCode = msg.from.language_code; // Получаем language_code
     const text = msg.text;
 
-    if (text && text.startsWith('/start')) {
-        // Пример логики обработки команды /start
-        await bot.sendMessage(chatId, `Привет, ${username}! Добро пожаловать!`);
+    let profilePhoto = '';
+
+    try {
+        profilePhoto = createProfileImage(username.charAt(0).toUpperCase());
+    } catch (error) {
+        console.error('Ошибка при создании изображения профиля:', error);
+    }
+
+    if (text && text.startsWith("/start")) {
+        const refCodeMatch = text.match(/\/start (.+)/);
+        const referrerReferralCode = refCodeMatch ? refCodeMatch[1].replace('ref_', '') : null;
+
+        let user = await User.findOne({ chatId });
+        let referrer = null;
+
+        if (referrerReferralCode) {
+            referrer = await User.findOne({ referralCode: referrerReferralCode });
+        }
+
+        if (!user) {
+            const referralCode = generateReferralCode();
+
+            const newUser = new User({
+                chatId,
+                username,
+                profilePhoto,
+                referralCode,
+                referrerChatId: null,
+                referrals: [],
+                balance: 0,
+                donated: 0,
+                echaCoins: 0,
+                farmingStartTime: null,
+                languageCode, // Сохраняем language_code
+                hasReceivedReferralBonus: false // Новый флаг
+            });
+
+            if (referrer && referrer.chatId !== chatId) {
+                const isPremium = await checkUserPremiumStatus(msg.from.id);
+                const bonus = isPremium ? 30000 : 10000;
+
+                newUser.referrerChatId = referrer.chatId;
+                referrer.referrals.push(newUser.username);
+                referrer.echaCoins += bonus;
+                await referrer.save();
+                await bot.sendMessage(referrer.chatId, `Новый пользователь @${username} присоединился по вашей ссылке и вы получили ${bonus} ECHA!`);
+                newUser.hasReceivedReferralBonus = true; // Установить флаг
+            }
+
+            user = await newUser.save();
+        } else if (referrer && !user.hasReceivedReferralBonus && !user.referrerChatId) { // Проверка флага и отсутсвие реф. ID
+            if (referrer.chatId !== chatId) {
+                const isPremium = await checkUserPremiumStatus(msg.from.id);
+                const bonus = isPremium ? 30000 : 10000;
+
+                user.referrerChatId = referrer.chatId;
+                referrer.referrals.push(user.username);
+                referrer.echaCoins += bonus;
+                await referrer.save();
+                await bot.sendMessage(referrer.chatId, `Новый пользователь @${username} присоединился по вашей ссылке и вы получили ${bonus} ECHA!`);
+                user.hasReceivedReferralBonus = true; // Установить флаг
+                user = await user.save();
+            }
+        }
+
+        const invitationMessage = user.referrerChatId
+            ? `Добро пожаловать в EcoHero — Фонд помощи животным по всему миру`
+            : `EcoHero доступен только по приглашениям. Попросите друга пригласить вас.`;
+
+        const replyMarkup = user.referrerChatId
+            ? {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: 'GO!', web_app: { url: webAppUrl } }],
+                        [{ text: 'Присоединиться к сообществу!', url: communityAppUrl }]
+                    ]
+                }
+            }
+            : {
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: 'Присоединиться к сообществу!', url: communityAppUrl }]
+                    ]
+                }
+            };
+
+        await bot.sendMessage(chatId, `Привет @${username}! ${invitationMessage}`, replyMarkup);
     }
 });
 
-// Вспомогательные функции
 function generateReferralCode() {
     return crypto.randomBytes(4).toString('hex');
 }
@@ -71,4 +158,8 @@ function createProfileImage(letter) {
     return canvas.toDataURL();
 }
 
-module.exports = app; // Экспорт для Vercel
+
+
+app.listen(port, () => {
+    console.log(`Server is running at http://localhost:${port}`);
+});
