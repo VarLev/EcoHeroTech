@@ -138,4 +138,4 @@ function createProfileImage(letter) {
     return canvas.toDataURL();
 }
 
-module.exports = bot;
+// module.exports = bot;

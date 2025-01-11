@@ -1,9 +1,11 @@
-const serverUrl = 'https://54.37.80.99';
+//const serverUrl = 'https://54.37.80.99';
+const serverUrl = 'https://de5e-2800-40-79-f062-d1e4-2131-2bf4-553c.ngrok-free.app';
 
 const getUserByChatId = async (chatId) => {
   const response = await fetch(`${serverUrl}/api/users/${chatId}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -16,6 +18,7 @@ const getChatIdByUsername = async (username) => {
   const response = await fetch(`${serverUrl}/api/users/chat-id/${username}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -28,6 +31,7 @@ const getUserLanguage = async (chatId) => {
   const response = await fetch(`${serverUrl}/api/users/language/${chatId}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -43,6 +47,7 @@ const updateUserBalanceAndEcha = async (chatId, amount, echaCoins) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
     body: JSON.stringify({ chatId, amount, echaCoins }),
   });
@@ -59,6 +64,7 @@ const updateUserBalanceAndDonated = async (chatId, amount) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
     body: JSON.stringify({ chatId, amount }),
   });
@@ -75,6 +81,7 @@ const startFarming = async (chatId) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
     body: JSON.stringify({ chatId }),
   });
@@ -88,6 +95,7 @@ const getFarmingStatus = async (chatId) => {
   const response = await fetch(`${serverUrl}/api/users/farming-status/${chatId}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -102,6 +110,7 @@ const updateEchaCoins = async (chatId, echaCoins) => {
     headers: {
       'Content-Type': 'application/json',
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
     body: JSON.stringify({ chatId, echaCoins }),
   });
@@ -115,6 +124,7 @@ const getReferrals = async (chatId) => {
   const response = await fetch(`${serverUrl}/api/users/referrals/${chatId}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -145,6 +155,7 @@ const getTopDonors = async () => {
   const response = await fetch(`${serverUrl}/api/users/top-donors`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
@@ -157,6 +168,7 @@ const getDonationsByUsername = async (username) => {
   const response = await fetch(`${serverUrl}/api/users/donations/${username}`, {
     headers: {
       'Accept': 'application/json',
+      'ngrok-skip-browser-warning': 'true',
     },
   });
   if (!response.ok) {
