@@ -156,6 +156,7 @@ const getTopDonors = async () => {
     headers: {
       'Accept': 'application/json',
       'ngrok-skip-browser-warning': 'true',
+      'X-Vercel-Disable-Logging': 'true',
     },
   });
   if (!response.ok) {

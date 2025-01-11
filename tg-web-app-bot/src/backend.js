@@ -10,6 +10,13 @@ const port = process.env.PORT || 3001;
 connectDB();
 
 app.use(cors()); // Включить CORS для всех маршрутов
+app.use(
+    cors({
+      origin: 'https://https://telegramapp-eight.vercel.app/', // Ваш фронтенд-домен
+      methods: ['GET', 'POST', 'PUT', 'DELETE'], // Разрешённые методы
+      credentials: true,
+    })
+  );
 app.use(express.json());
 
 app.get('/', (req, res) => {
