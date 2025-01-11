@@ -11,8 +11,8 @@ connectDB();
 app.use(cors()); // Включить CORS для всех маршрутов
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
+app.get('/backend', (req, res) => {
+    res.send('Hello from backend!');
 });
 
 // Маршруты пользователя
