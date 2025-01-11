@@ -1,5 +1,5 @@
 //const serverUrl = 'https://54.37.80.99';
-const serverUrl = 'https://de5e-2800-40-79-f062-d1e4-2131-2bf4-553c.ngrok-free.app';
+const serverUrl = 'https://telegramapp-lyjm.vercel.app/';
 
 const getUserByChatId = async (chatId) => {
   const response = await fetch(`${serverUrl}/api/users/${chatId}`, {
