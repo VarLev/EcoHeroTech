@@ -1,6 +1,6 @@
 //const serverUrl = 'https://54.37.80.99';
-//const serverUrl = 'https://telegramapp-back.vercel.app';
-const serverUrl = 'https://d53b-2800-40-79-f062-945-56e4-8eb1-e48e.ngrok-free.app';
+const serverUrl = 'https://telegramapp-back.vercel.app';
+//const serverUrl = 'https://d53b-2800-40-79-f062-945-56e4-8eb1-e48e.ngrok-free.app';
 
 
 const getUserByChatId = async (chatId) => {
