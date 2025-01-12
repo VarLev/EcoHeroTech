@@ -12,7 +12,7 @@ connectDB();
 app.use(cors()); // Включить CORS для всех маршрутов
 app.use(
     cors({
-      origin: 'https://https://telegramapp-eight.vercel.app/', // Ваш фронтенд-домен
+      origin: 'https://telegramapp-eight.vercel.app/', // Ваш фронтенд-домен
       methods: ['GET', 'POST', 'PUT', 'DELETE'], // Разрешённые методы
       credentials: true,
     })
