@@ -93,12 +93,14 @@ bot.on('message', async (msg) => {
             }
         }
 
-        const invitationMessage = user.referrerChatId
-            ? `Добро пожаловать в EcoHero — Фонд помощи животным по всему миру`
-            : `EcoHero доступен только по приглашениям. Попросите друга пригласить вас.`;
+        const invitationMessage = `Добро пожаловать в EcoHero — Фонд помощи животным по всему миру`;
 
-        const replyMarkup = user.referrerChatId
-            ? {
+        // const invitationMessage = user.referrerChatId
+        //     ? `Добро пожаловать в EcoHero — Фонд помощи животным по всему миру`
+        //     : `EcoHero доступен только по приглашениям. Попросите друга пригласить вас.`;
+
+
+            const replyMarkup ={
                 reply_markup: {
                     inline_keyboard: [
                         [{ text: 'GO!', web_app: { url: webAppUrl } }],
@@ -106,13 +108,23 @@ bot.on('message', async (msg) => {
                     ]
                 }
             }
-            : {
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: 'Присоединиться к сообществу!', url: communityAppUrl }]
-                    ]
-                }
-            };
+
+        // const replyMarkup = user.referrerChatId
+        //     ? {
+        //         reply_markup: {
+        //             inline_keyboard: [
+        //                 [{ text: 'GO!', web_app: { url: webAppUrl } }],
+        //                 [{ text: 'Присоединиться к сообществу!', url: communityAppUrl }]
+        //             ]
+        //         }
+        //     }
+        //     : {
+        //         reply_markup: {
+        //             inline_keyboard: [
+        //                 [{ text: 'Присоединиться к сообществу!', url: communityAppUrl }]
+        //             ]
+        //         }
+        //     };
 
         await bot.sendMessage(chatId, `Привет @${username}! ${invitationMessage}`, replyMarkup);
     }
