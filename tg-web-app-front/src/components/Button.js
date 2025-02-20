@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { handleShowAd } from '../services/adsgram';
+// import { handleShowAd } from '../services/adsgram';
+import { adComponent } from '../services/AdComponent';
 import { useNavigate } from 'react-router-dom';
 
 const StyledButton = styled.button`
@@ -20,7 +21,8 @@ const Button = ({ text, color, chatId, language, setAnimate }) => {
   const navigate = useNavigate();
 
   const handleAdClick = async () => {
-    await handleShowAd(chatId, language, setAnimate, navigate);
+        console.log('Ad button clicked');
+    await adComponent(chatId, language, setAnimate, navigate);
   };
 
   return (

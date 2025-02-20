@@ -47,6 +47,7 @@ const AppContentWithRouter = () => {
   useEffect(() => {
     window.Telegram.WebApp.ready();
     const initData = window.Telegram.WebApp.initDataUnsafe;
+
     setTelegramUsername(initData.user.username);
   }, []);
 

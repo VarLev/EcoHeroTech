@@ -1,6 +1,6 @@
 const express = require('express');
 const User = require('../models/user'); 
-const bot = require('../index.js'); 
+// const bot = require('../index.js'); 
 
 const router = express.Router();
 
